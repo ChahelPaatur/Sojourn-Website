@@ -3,43 +3,258 @@
 @tailwind utilities;
 
 :root {
-  --background-dark: #0a0a0a;
-  --background-darker: #050505;
-  --accent-yellow: #FFD700;
-  --accent-yellow-dim: #B8860B;
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 14, 26, 43; /* Dark blue base from LA sunset */
+  --background-end-rgb: 8, 18, 33; /* Darker blue for depth */
+  --accent-primary: 255, 126, 84; /* Vibrant orange */
+  --accent-secondary: 207, 75, 108; /* Deep pink-purple */
+  --accent-tertiary: 157, 72, 129; /* Purple hue */
+  --accent-highlight: 255, 177, 122; /* Lighter orange glow */
+  --sunset-glow: 255, 180, 77; /* Golden sunset glow */
 }
 
-@layer base {
-  body {
-    @apply bg-[#0a0a0a] text-white antialiased;
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+/* More subtle glowing text effects with pulsating animation */
+@keyframes subtle-pulse {
+  0%, 100% { 
+    opacity: 0.7;
+    filter: blur(0.3px);
+  }
+  50% { 
+    opacity: 1;
+    filter: blur(0.5px);
   }
 }
 
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SF-Pro-Display-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+/* LA Sunset specific text glow */
+.text-shadow-sunset {
+  text-shadow: 
+    0 0 10px rgba(255, 126, 84, 0.5),
+    0 0 20px rgba(255, 126, 84, 0.3),
+    0 0 30px rgba(255, 180, 77, 0.2);
+  animation: sunset-pulse 4s ease-in-out infinite;
 }
 
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SF-Pro-Display-Bold.otf') format('opentype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
+@keyframes sunset-pulse {
+  0%, 100% { 
+    text-shadow: 
+      0 0 10px rgba(255, 126, 84, 0.5),
+      0 0 20px rgba(255, 126, 84, 0.3),
+      0 0 30px rgba(255, 180, 77, 0.2);
+  }
+  50% { 
+    text-shadow: 
+      0 0 15px rgba(255, 126, 84, 0.6),
+      0 0 25px rgba(255, 126, 84, 0.4),
+      0 0 35px rgba(255, 180, 77, 0.3);
+  }
 }
 
-.logo {
-  font-family: 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-weight: bold;
-  letter-spacing: -0.03em;
+/* General subtler glow for all headings */
+h2 {
+  text-shadow: 0 0 5px rgba(255, 126, 84, 0.3), 0 0 8px rgba(255, 126, 84, 0.2);
+  animation: subtle-pulse 4s ease-in-out infinite;
 }
 
-/* Enhanced Animations */
+/* Features section headings subtle glow */
+#features h2, #features h3, .features-heading {
+  text-shadow: 0 0 5px rgba(255, 126, 84, 0.3), 0 0 8px rgba(255, 126, 84, 0.2), 0 0 12px rgba(255, 126, 84, 0.1);
+  animation: subtle-pulse 4s ease-in-out infinite;
+}
+
+/* Map section headings subtle glow */
+#map h2, #map h3, .map-heading {
+  text-shadow: 0 0 5px rgba(207, 75, 108, 0.3), 0 0 8px rgba(207, 75, 108, 0.2), 0 0 12px rgba(207, 75, 108, 0.1);
+  animation: subtle-pulse 4.5s ease-in-out infinite;
+}
+
+/* Team section headings subtle glow */
+#team h2, #team h3, .team-heading {
+  text-shadow: 0 0 5px rgba(157, 72, 129, 0.3), 0 0 8px rgba(157, 72, 129, 0.2), 0 0 12px rgba(157, 72, 129, 0.1);
+  animation: subtle-pulse 5s ease-in-out infinite;
+}
+
+/* Pricing section headings subtle glow */
+#pricing h2, #pricing h3, .pricing-heading {
+  text-shadow: 0 0 5px rgba(255, 177, 122, 0.3), 0 0 8px rgba(255, 177, 122, 0.2), 0 0 12px rgba(255, 177, 122, 0.1);
+  animation: subtle-pulse 4.3s ease-in-out infinite;
+}
+
+/* Contact section headings subtle glow */
+#contact h2, #contact h3, .contact-heading {
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3), 0 0 8px rgba(255, 215, 0, 0.2), 0 0 12px rgba(255, 215, 0, 0.1);
+  animation: subtle-pulse 4.7s ease-in-out infinite;
+}
+
+/* Newsletter section headings subtle glow */
+#newsletter h2, #newsletter h3, .newsletter-heading {
+  text-shadow: 0 0 5px rgba(14, 165, 198, 0.3), 0 0 8px rgba(6, 211, 215, 0.2), 0 0 12px rgba(10, 94, 143, 0.1);
+  animation: subtle-pulse 4.5s ease-in-out infinite;
+}
+
+/* Lighter elements for fading effect */
+.glow-light {
+  position: relative;
+}
+
+.glow-light::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  animation: glow-fade 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes glow-fade {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 0.3; transform: scale(1); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(var(--background-end-rgb), 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-primary), 0.5);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--accent-primary), 0.7);
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-white px-5 py-2 rounded-md 
+  hover:shadow-lg hover:shadow-[#ff7e54]/10 transition-all duration-500;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.btn-primary:hover::after {
+  opacity: 1;
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+.btn-outline {
+  @apply border border-[#ff7e54] text-[#ff7e54] px-5 py-2 rounded-md
+  hover:bg-[#ff7e54]/10 transition-all duration-300;
+}
+
+/* Earth Globe Animations */
+@keyframes rotate-day {
+  0% { background-position: 120% 0; }
+  100% { background-position: -80% 0; }
+}
+
+@keyframes rotate-night {
+  0% { background-position: calc(120% + 120px) 0; }
+  100% { background-position: calc(-80% + 120px) 0; }
+}
+
+@keyframes spin-clouds {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Nihilism-inspired decorative elements */
+.nihil-dot {
+  @apply absolute w-2 h-2 rounded-full border border-[#cf4b6c]/50;
+}
+
+.nihil-line {
+  @apply absolute bg-gradient-to-r from-[#ff7e54]/20 to-transparent;
+}
+
+/* Loading animation for async operations */
+.loading-dots {
+  @apply flex space-x-2 justify-center items-center;
+}
+
+.loading-dots div {
+  @apply w-2 h-2 rounded-full bg-[#ff7e54] animate-pulse;
+}
+
+.loading-dots div:nth-child(2) {
+  animation-delay: 0.2s;
+  @apply bg-[#cf4b6c];
+}
+
+.loading-dots div:nth-child(3) {
+  animation-delay: 0.4s;
+  @apply bg-[#9d4881];
+}
+
+/* Glass effect */
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-lg;
+}
+
+/* Enhanced Floating Animations */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.floating-slow {
+  animation: float-slow 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-medium {
+  animation: float-medium 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Interactive Globe Styles */
+.interactive-globe {
+  @apply relative w-full h-full cursor-grab active:cursor-grabbing;
+  transform-style: preserve-3d;
+}
+
+.interactive-globe:active {
+  cursor: grabbing;
+}
+
+/* Existing animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -47,12 +262,12 @@
 
 @keyframes pulse-glow {
   0%, 100% { 
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 10px rgba(255, 126, 84, 0.1);
     transform: scale(1);
   }
   50% { 
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
-    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 126, 84, 0.2);
+    transform: scale(1.01);
   }
 }
 
@@ -67,24 +282,25 @@
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+  animation: pulse-glow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .gradient-text {
-  background: linear-gradient(45deg, var(--accent-yellow), var(--accent-yellow-dim));
+  background: linear-gradient(45deg, #ff7e54, #cf4b6c);
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
 /* Glassmorphism */
 .glass {
-  background: rgba(10, 10, 10, 0.7);
+  background: rgba(14, 26, 43, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 126, 84, 0.1);
 }
 
 /* Performance Optimizations */
@@ -100,24 +316,6 @@
 /* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background-darker);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--accent-yellow-dim);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-yellow);
 }
 
 /* Smooth transitions for dark mode */
@@ -138,17 +336,21 @@ html {
   @apply border-none shadow-xl !important;
 }
 
+/* Loading Spinner */
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid #FFD700;
   border-radius: 50%;
-  border-top-color: transparent;
+  border: 3px solid rgba(255, 126, 84, 0.1);
+  border-top-color: rgba(255, 126, 84, 0.8);
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
     transform: rotate(360deg);
   }
 }
@@ -161,13 +363,6 @@ html {
   transform-style: preserve-3d;
 }
 
-.gradient-text {
-  background: linear-gradient(to right, #FFD700, #B8860B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
@@ -175,17 +370,200 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Light particles effect */
+.light-particles {
+  position: relative;
 }
 
-@keyframes pulse-glow {
+.light-particles::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.05) 2px, transparent 2px);
+  background-size: 30px 30px, 60px 60px;
+  background-position: 0 0, 15px 15px;
+  animation: particle-fade 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Alternative light particles effect for Pinterest section */
+.light-particles-alt {
+  position: relative;
+}
+
+.light-particles-alt::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle, rgba(255, 177, 122, 0.08) 1px, transparent 1px),
+    radial-gradient(circle, rgba(207, 75, 108, 0.05) 2px, transparent 2px);
+  background-size: 40px 40px, 70px 70px;
+  background-position: 0 0, 20px 20px;
+  animation: particle-fade-alt 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes particle-fade-alt {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes particle-fade {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.3; }
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* Add a delicate shimmer effect for UI accents */
+@keyframes subtle-shimmer {
   0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    background-position: 0% 50%;
+    opacity: 0.7;
   }
   50% {
-    opacity: 0.8;
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+    background-position: 100% 50%;
+    opacity: 1;
   }
+}
+
+.shimmer-accent {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-accent::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  animation: shimmer-sweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* More delicate glow for section transitions */
+.section-transition {
+  position: relative;
+}
+
+.section-transition::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 126, 84, 0.03));
+}
+
+/* Gradient animations */
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 5s ease infinite;
+}
+
+/* Performance optimizations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-opacity {
+    will-change: opacity;
+  }
+  
+  .hardware-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* Light particles effect variation for sunset */
+.light-particles-sunset {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(#ff7e54 1px, transparent 1px), 
+    radial-gradient(#ff6a6a 1px, transparent 1px),
+    radial-gradient(#ffb44d 1px, transparent 1px);
+  background-size: 40px 40px, 60px 60px, 100px 100px;
+  background-position: 0 0, 10px 10px, 20px 20px;
+  animation: sunsetParticlesFloat 60s linear infinite;
+  opacity: 0.15;
+}
+
+@keyframes sunsetParticlesFloat {
+  0% { background-position: 0 0, 10px 10px, 20px 20px; }
+  100% { background-position: 40px 40px, 70px 50px, 60px 60px; }
+}
+
+/* Additional sunset-specific styling */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+/* Tailwind doesn't have radial gradients by default, so add this utility */
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(var(--tw-gradient-stops));
+  }
+}
+
+/* Add optimized rotation animation for the globe */
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rotate-animate {
+  animation: rotate 60s linear infinite;
+  will-change: transform;
 } 

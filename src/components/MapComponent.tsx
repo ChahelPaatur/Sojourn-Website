@@ -30,16 +30,16 @@ export default function MapComponent({ onLoad }: MapComponentProps) {
   // Example locations with route
   const locations: Location[] = [
     {
-      latitude: 35.6762,
-      longitude: 139.6503,
-      name: "Tokyo",
+      latitude: 37.7749,
+      longitude: -122.4194,
+      name: "San Francisco",
       description: "Starting point of your journey",
       type: 'origin'
     },
     {
-      latitude: 37.7749,
-      longitude: -122.4194,
-      name: "San Francisco",
+      latitude: 35.6762,
+      longitude: 139.6503,
+      name: "Tokyo",
       description: "Your destination",
       type: 'destination'
     }
@@ -78,7 +78,7 @@ export default function MapComponent({ onLoad }: MapComponentProps) {
       locations.forEach((location) => {
         const markerElement = document.createElement('div')
         markerElement.className = `w-6 h-6 rounded-full ${
-          location.type === 'origin' ? 'bg-[#FFD700]' : 'bg-[#4CAF50]'
+          location.type === 'origin' ? 'bg-[#ff7e54]' : 'bg-[#cf4b6c]'
         } border-2 border-white shadow-lg`
 
         const marker = new window.mapkit.MarkerAnnotation(
@@ -110,7 +110,7 @@ export default function MapComponent({ onLoad }: MapComponentProps) {
         lineWidth: 4,
         lineGradient: {
           type: 'linear',
-          colors: ['#FFD700', '#4CAF50'],
+          colors: ['#ff7e54', '#cf4b6c'],
           locations: [0.0, 1.0]
         },
         lineDash: [8, 4],
@@ -160,7 +160,7 @@ export default function MapComponent({ onLoad }: MapComponentProps) {
           >
             <h3 className="text-xl font-semibold text-white mb-2 flex items-center">
               <span className={`w-3 h-3 rounded-full mr-2 ${
-                selectedLocation.type === 'origin' ? 'bg-[#FFD700]' : 'bg-[#4CAF50]'
+                selectedLocation.type === 'origin' ? 'bg-[#ff7e54]' : 'bg-[#cf4b6c]'
               }`} />
               {selectedLocation.name}
             </h3>

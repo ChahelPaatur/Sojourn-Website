@@ -35,7 +35,10 @@ export default function Phone3DModel() {
               muted
               playsInline
               onLoadedData={() => setIsVideoLoaded(true)}
-              style={{ opacity: isVideoLoaded ? 1 : 0 }}
+              style={{ 
+                opacity: isVideoLoaded ? 1 : 0,
+                objectPosition: '50% 15%'
+              }}
               preload="auto"
             >
               <source src="/app-demo.mp4" type="video/mp4" />

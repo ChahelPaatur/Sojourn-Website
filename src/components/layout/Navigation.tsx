@@ -48,12 +48,19 @@ const Navigation = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex-shrink-0"
+            className="flex-shrink-0 mr-auto"
           >
             <Link 
               href="/" 
-              className="text-2xl font-bold text-primary-dark dark:text-primary-light"
+              className="text-3xl font-bold text-primary-dark dark:text-primary-light"
               onClick={(e) => handleScroll(e, '#')}
+              style={{
+                textShadow: theme === 'dark' 
+                  ? '0 0 5px rgba(255, 126, 84, 0.3), 0 0 8px rgba(255, 126, 84, 0.2)' 
+                  : '0 0 4px rgba(255, 126, 84, 0.2), 0 0 7px rgba(255, 126, 84, 0.1)',
+                animation: 'subtle-pulse 4s ease-in-out infinite',
+                fontFamily: "'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+              }}
             >
               SoJourn
             </Link>
@@ -72,34 +79,20 @@ const Navigation = () => {
                   <Link
                     href={item.href}
                     className="text-gray-700 hover:text-primary-light dark:text-gray-300 dark:hover:text-primary-light
-                             transition-colors duration-200"
+                             transition-colors duration-200 font-medium"
                     onClick={(e) => handleScroll(e, item.href)}
+                    style={{
+                      textShadow: theme === 'dark' 
+                        ? '0 0 3px rgba(255, 126, 84, 0.2), 0 0 5px rgba(255, 126, 84, 0.1)' 
+                        : '0 0 3px rgba(255, 126, 84, 0.15), 0 0 5px rgba(255, 126, 84, 0.05)',
+                      animation: 'subtle-pulse 4s ease-in-out infinite',
+                      fontFamily: "'SF Pro Text', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    }}
                   >
                     {item.name}
                   </Link>
                 </motion.div>
               ))}
-              
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 transition-colors duration-200"
-              >
-                {mounted && (
-                  theme === 'dark' ? (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                    </svg>
-                  )
-                )}
-              </button>
             </div>
           </div>
 
@@ -152,6 +145,11 @@ const Navigation = () => {
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300
                        hover:text-primary-light dark:hover:text-primary-light transition-colors duration-200"
               onClick={(e) => handleScroll(e, item.href)}
+              style={{
+                textShadow: theme === 'dark' 
+                  ? '0 0 3px rgba(255, 126, 84, 0.2), 0 0 5px rgba(255, 126, 84, 0.1)' 
+                  : '0 0 3px rgba(255, 126, 84, 0.15), 0 0 5px rgba(255, 126, 84, 0.05)',
+              }}
             >
               {item.name}
             </Link>

@@ -52,7 +52,7 @@ const Navigation = () => {
           >
             <Link 
               href="/" 
-              className="text-2xl font-bold text-primary-dark dark:text-primary-light"
+              className="text-2xl font-bold text-[#ff7e54]"
               onClick={(e) => handleScroll(e, '#')}
             >
               SoJourn
