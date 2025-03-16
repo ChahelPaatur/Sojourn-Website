@@ -4,6 +4,26 @@ import { NextResponse } from 'next/server';
 // For now, we'll store emails in memory (Note: this is temporary and will reset on server restart)
 let subscribedEmails: string[] = [];
 
+// GET endpoint to retrieve all subscribed emails
+export async function GET() {
+  try {
+    // In a production environment, you would want to add authentication here
+    // to ensure only authorized users can access this data
+    
+    return NextResponse.json({
+      success: true,
+      count: subscribedEmails.length,
+      emails: subscribedEmails
+    });
+  } catch (error) {
+    console.error('Error retrieving emails:', error);
+    return NextResponse.json(
+      { error: 'Failed to retrieve subscribed emails' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();

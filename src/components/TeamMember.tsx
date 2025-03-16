@@ -35,12 +35,13 @@ export default function TeamMember({ name, role, bio, image, social, index }: Te
         width: '280px',
         height: '350px',
         background: 'rgba(10, 22, 37, 0.7)',
-        borderRadius: '32px',
+        borderRadius: '60px',
         padding: '3px',
         position: 'relative',
         boxShadow: 'rgba(96, 75, 74, 0.188) 0px 70px 30px -50px',
         transition: 'all 0.5s ease-in-out',
-        margin: '0 auto'
+        margin: '0 auto',
+        overflow: 'hidden'
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -83,7 +84,7 @@ export default function TeamMember({ name, role, bio, image, social, index }: Te
           height: isHovered ? '100px' : 'calc(100% - 6px)',
           top: isHovered ? '10px' : '3px',
           left: isHovered ? '10px' : '3px',
-          borderRadius: isHovered ? '50%' : '29px 29px 0 0',
+          borderRadius: isHovered ? '50%' : '55px 55px 0 0',
           zIndex: isHovered ? 3 : 1,
           border: isHovered ? '7px solid #ff7e54' : '0px solid #ff7e54',
           overflow: 'hidden',
@@ -119,7 +120,7 @@ export default function TeamMember({ name, role, bio, image, social, index }: Te
           right: '3px',
           // Increased bottom bar height by setting top position to 85% instead of 95%
           top: isHovered ? '20%' : '85%',
-          borderRadius: isHovered ? '80px 29px 29px 29px' : '29px',
+          borderRadius: isHovered ? '80px 55px 55px 55px' : '55px',
           zIndex: 2,
           background: '#ff7e54',
           boxShadow: 'rgba(96, 75, 74, 0.188) 0px 5px 5px 0px inset',
@@ -236,9 +237,9 @@ export default function TeamMember({ name, role, bio, image, social, index }: Te
               background: 'white',
               color: '#ff7e54',
               border: 'none',
-              borderRadius: '20px',
+              borderRadius: '50px',
               fontSize: '0.55rem',
-              padding: '0.35rem 0.55rem',
+              padding: '0.4rem 0.8rem',
               boxShadow: 'rgba(165, 132, 130, 0.133) 0px 5px 5px 0px',
               cursor: 'pointer'
             }}
