@@ -35,11 +35,15 @@ const SubscribeCard: React.FC<SubscribeCardProps> = ({
     setIsSubmitting(true);
     
     try {
-      // Make a real API call to our backend
+      // Send to the backend API
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          timestamp: new Date().toISOString(), // Add timestamp for admin display
+          source: 'newsletter_signup'
+        }),
       });
       
       const data = await response.json();
@@ -48,8 +52,17 @@ const SubscribeCard: React.FC<SubscribeCardProps> = ({
         throw new Error(data.error || 'Subscription failed');
       }
       
+      // Successfully added to admin dashboard
       setIsSubmitted(true);
       setEmail('');
+      
+      // Optional: Track conversion event
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'newsletter_signup', {
+          event_category: 'engagement',
+          event_label: 'newsletter'
+        });
+      }
     } catch (err) {
       setError('Failed to subscribe. Please try again.');
       console.error(err);

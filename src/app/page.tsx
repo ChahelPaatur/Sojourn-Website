@@ -10,6 +10,41 @@ import EarthGlobe from '@/components/EarthGlobe'
 import FloatingElement from '@/components/FloatingElement'
 import PinterestInspiration from '@/components/PinterestInspiration'
 
+// Utility function to detect if the device is mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+  
+  return isMobile;
+};
+
+// Utility to conditionally apply animations only on desktop
+const DesktopMotion: React.FC<any> = ({ children, ...props }) => {
+  const isMobile = useIsMobile();
+  
+  if (isMobile) {
+    // On mobile, don't animate - just render the children directly
+    return <div className={props.className || ''}>{children}</div>;
+  }
+  
+  // On desktop, use animation
+  return <motion.div {...props}>{children}</motion.div>;
+};
+
 // Preload team member images for faster rendering
 const teamMembers = [
   {
@@ -26,7 +61,7 @@ const teamMembers = [
     name: "Harshith Chemudugunta",
     role: "Lead Marketer and Backend",
     bio: "Passionate about growth strategies and robust backend architecture",
-    image: "/team/Harshith.JPG",
+    image: "/team/Harshith (1).JPG",
     social: [
       { type: 'github' as const, url: "https://github.com/harshithc" },
       { type: 'instagram' as const, url: "https://instagram.com/harshithc" }
@@ -143,21 +178,20 @@ export default function Home() {
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [activeFeature, setActiveFeature] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  
+  const isMobile = useIsMobile();
+   
   // Only track scroll for visible elements with more performant config
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   })
-
+    
   // More performant spring config with reduced motion
   const springConfig = { stiffness: 50, damping: 20, restDelta: 0.05 }
-  const y = useSpring(useTransform(scrollYProgress, [0, 1], [0, -30]), springConfig)
-  const opacity = useSpring(useTransform(scrollYProgress, [0, 0.2], [1, 0]), springConfig)
-  const scale = useSpring(useTransform(scrollYProgress, [0, 0.2], [1, 0.9]), springConfig)
-
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 150])
-  const parallaxSpring = useSpring(parallaxY, springConfig)
+  const parallaxSpring = useSpring(
+    useTransform(scrollYProgress, [0, 1], [0, isMobile ? 100 : 300]), 
+    springConfig
+  )
 
   // Defer loading of heavy components based on viewport visibility
   const [shouldLoadMap, setShouldLoadMap] = useState(false)
@@ -208,71 +242,9 @@ export default function Home() {
   }, [])
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#0e1a2b] relative overflow-hidden will-change-transform hardware-accelerated">
-      {/* Background Floating Elements - reduced for performance */}
-      <FloatingElement
-        type="circle"
-        color="#ff7e54"
-        size={150}
-        opacity={0.05}
-        blur={40}
-        speed="slow"
-        style={{ top: '15%', left: '10%' }}
-      />
-      <FloatingElement
-        type="square"
-        color="#cf4b6c"
-        size={120}
-        opacity={0.04}
-        blur={30}
-        speed="medium"
-        delay={2}
-        style={{ top: '40%', right: '8%' }}
-      />
-      <FloatingElement
-        type="triangle"
-        color="#ffb44d"
-        size={90}
-        opacity={0.03}
-        blur={25}
-        speed="slow"
-        delay={1.5}
-        style={{ bottom: '20%', left: '15%' }}
-      />
-      
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0e1a2b]/80 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <a href="#" className="text-2xl font-extrabold">
-                <span className="bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-transparent bg-clip-text">So</span>
-                <span className="text-white">Journ</span>
-              </a>
-            </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#pinterest" className="text-white/70 hover:text-[#ff7e54] transition-colors">Integrations</a>
-              <a href="#booking" className="text-white/70 hover:text-[#ff7e54] transition-colors">Booking</a>
-              <a href="#map" className="text-white/70 hover:text-[#ff7e54] transition-colors">Experience</a>
-              <a href="#pricing" className="text-white/70 hover:text-[#ff7e54] transition-colors">Pricing</a>
-              <a href="#newsletter" className="text-white/70 hover:text-[#0ea5c6] transition-colors">Subscribe</a>
-              <a href="#team" className="text-white/70 hover:text-[#ff7e54] transition-colors">Team</a>
-            </nav>
-            <div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-white rounded-full font-medium"
-              >
-                Download App
-              </motion.button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div ref={containerRef} className="relative">
       {/* Hero Section with Animated Globe */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 pb-20 light-particles">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-20 light-particles">
         {/* Background Globe - more efficient rendering */}
         <motion.div
           style={{ y: parallaxSpring }}
@@ -293,7 +265,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <motion.div
+            <DesktopMotion
               className="mb-12"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -306,30 +278,33 @@ export default function Home() {
                   <EarthGlobe size={180} />
                 </div>
               </div>
-            </motion.div>
-            <motion.h2
+            </DesktopMotion>
+            
+            <DesktopMotion
               className="text-6xl sm:text-8xl font-bold mb-8 gradient-text"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
               AI-Planned Trips
-            </motion.h2>
-            <motion.p
+            </DesktopMotion>
+            
+            <DesktopMotion
               className="text-xl sm:text-2xl text-white/70 mb-12 max-w-3xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               Your intelligent travel companion that creates personalized adventures just for you.
-            </motion.p>
-            <motion.div
+            </DesktopMotion>
+            
+            <DesktopMotion
               className="flex flex-col sm:flex-row gap-6 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <motion.a
+              <DesktopMotion
                 href="/countdown"
                 className="px-8 py-4 bg-[#ff7e54] text-black rounded-full font-semibold text-lg
                          hover:bg-[#cf4b6c] transition-colors animate-pulse-glow flex items-center justify-center space-x-2"
@@ -340,8 +315,8 @@ export default function Home() {
                   <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09997 22C7.78997 22.05 6.79997 20.68 5.95997 19.47C4.24997 17 2.93997 12.45 4.69997 9.39C5.56997 7.87 7.12997 6.91 8.81997 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
                 </svg>
                 <span>Download Now</span>
-              </motion.a>
-              <motion.a
+              </DesktopMotion>
+              <DesktopMotion
                 href="#features"
                 className="px-8 py-4 border-2 border-[#ff7e54] text-[#ff7e54] rounded-full
                          font-semibold text-lg hover:bg-[#ff7e54]/10 transition-colors"
@@ -349,8 +324,8 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
               >
                 Learn More
-              </motion.a>
-            </motion.div>
+              </DesktopMotion>
+            </DesktopMotion>
           </div>
         </div>
         
@@ -442,7 +417,7 @@ export default function Home() {
           style={{ top: '10%', right: '15%' }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -455,11 +430,11 @@ export default function Home() {
             <p className="text-xl text-white/70">
               Powered by ChatGPT-4 and your personal preferences
             </p>
-          </motion.div>
+          </DesktopMotion>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <motion.div
+              <DesktopMotion
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -468,20 +443,24 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 className="glass rounded-xl p-6 hover:bg-[#ff7e54]/5 transition-colors"
               >
-                <motion.div
+                <DesktopMotion
                   className="text-[#ff7e54] mb-4"
                   whileHover={{ rotate: 360, scale: 1.1 }}
                   transition={{ duration: 0.5 }}
                 >
                   {feature.icon}
-                </motion.div>
-                <h3 className="text-xl font-semibold text-white mb-2">
+                </DesktopMotion>
+                <DesktopMotion
+                  className="text-xl font-semibold text-white mb-2"
+                >
                   {feature.title}
-                </h3>
-                <p className="text-white/70">
+                </DesktopMotion>
+                <DesktopMotion
+                  className="text-white/70"
+                >
                   {feature.description}
-                </p>
-              </motion.div>
+                </DesktopMotion>
+              </DesktopMotion>
             ))}
           </div>
         </div>
@@ -525,7 +504,7 @@ export default function Home() {
           style={{ bottom: '30%', right: '12%' }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -538,11 +517,11 @@ export default function Home() {
             <p className="text-xl text-white/70">
               Book your entire trip through our trusted partners
             </p>
-          </motion.div>
+          </DesktopMotion>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {bookingPartners.map((partner, index) => (
-              <motion.div
+              <DesktopMotion
                 key={partner.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -550,23 +529,31 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="glass rounded-xl p-8 hover:bg-[#ff7e54]/5 transition-colors"
               >
-                <h3 className="text-2xl font-semibold text-white mb-4">
+                <DesktopMotion
+                  className="text-2xl font-semibold text-white mb-4"
+                >
                   {partner.name}
-                </h3>
-                <p className="text-white/70 mb-6">
+                </DesktopMotion>
+                <DesktopMotion
+                  className="text-white/70 mb-6"
+                >
                   {partner.description}
-                </p>
+                </DesktopMotion>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#ff7e54]">{partner.deals}</span>
-                  <motion.button
+                  <DesktopMotion
+                    className="text-[#ff7e54]"
+                  >
+                    {partner.deals}
+                  </DesktopMotion>
+                  <DesktopMotion
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-6 py-2 bg-[#ff7e54] text-black rounded-full font-semibold"
                   >
                     Book Now
-                  </motion.button>
+                  </DesktopMotion>
                 </div>
-              </motion.div>
+              </DesktopMotion>
             ))}
           </div>
         </div>
@@ -586,7 +573,7 @@ export default function Home() {
           style={{ top: '15%', right: '30%' }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -599,10 +586,10 @@ export default function Home() {
             <p className="text-xl text-white/70">
               Discover new destinations with our interactive Earth visualization
             </p>
-          </motion.div>
+          </DesktopMotion>
 
           <div className="flex flex-col lg:flex-row items-center gap-12">
-            <motion.div
+            <DesktopMotion
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -610,13 +597,19 @@ export default function Home() {
               className="flex-1"
             >
               <div className="max-w-xl">
-                <h3 className="text-2xl font-bold text-white mb-6">Your Journey Begins Here</h3>
-                <p className="text-white/70 mb-6">
+                <DesktopMotion
+                  className="text-2xl font-bold text-white mb-6"
+                >
+                  Your Journey Begins Here
+                </DesktopMotion>
+                <DesktopMotion
+                  className="text-white/70 mb-6"
+                >
                   Explore our beautiful planet and discover your next adventure. Our AI analyzes your preferences and travel history to recommend destinations you'll love.
-                </p>
+                </DesktopMotion>
                 <ul className="space-y-4 mb-8">
                   {['Real-time weather data', 'Cultural insights', 'Travel advisories', 'Visa requirements'].map((item, i) => (
-                    <motion.li 
+                    <DesktopMotion
                       key={i}
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -624,22 +617,30 @@ export default function Home() {
                       viewport={{ once: true }}
                       className="flex items-center text-white/70"
                     >
-                      <span className="text-[#ff7e54] mr-3">✓</span>
-                      {item}
-                    </motion.li>
+                      <DesktopMotion
+                        className="text-[#ff7e54] mr-3"
+                      >
+                        ✓
+                      </DesktopMotion>
+                      <DesktopMotion
+                        className="text-white/70"
+                      >
+                        {item}
+                      </DesktopMotion>
+                    </DesktopMotion>
                   ))}
                 </ul>
-                <motion.button
+                <DesktopMotion
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-8 py-4 bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-white rounded-full font-semibold text-lg"
                 >
                   Start Exploring
-                </motion.button>
+                </DesktopMotion>
               </div>
-            </motion.div>
+            </DesktopMotion>
             
-            <motion.div
+            <DesktopMotion
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
@@ -667,7 +668,7 @@ export default function Home() {
                 />
                 <EarthGlobe size={350} />
               </div>
-            </motion.div>
+            </DesktopMotion>
           </div>
         </div>
       </section>
@@ -703,7 +704,7 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-[#ff7e54]/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -716,11 +717,11 @@ export default function Home() {
             <p className="text-xl text-white/70">
               Plan your journey with our interactive map and route visualization
             </p>
-          </motion.div>
+          </DesktopMotion>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Interactive Map - only load when in viewport */}
-            <motion.div
+            <DesktopMotion
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
@@ -738,19 +739,36 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <span className="w-3 h-3 rounded-full bg-[#ff7e54]" />
-                    <div>
-                      <h4 className="text-white font-medium">Current Route</h4>
-                      <p className="text-white/70 text-sm">San Francisco → Tokyo</p>
-                    </div>
+                    <DesktopMotion
+                      className="text-white font-medium"
+                    >
+                      Current Route
+                    </DesktopMotion>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-center">
-                      <span className="text-[#ff7e54] block">10h 50m</span>
-                      <span className="text-white/50 text-sm">Flight Time</span>
+                      <DesktopMotion
+                        className="text-[#ff7e54] block"
+                      >
+                        10h 50m
+                      </DesktopMotion>
+                      <DesktopMotion
+                        className="text-white/50 text-sm"
+                      >
+                        Flight Time
+                      </DesktopMotion>
                     </div>
                     <div className="text-center">
-                      <span className="text-[#ff7e54] block">6,530 mi</span>
-                      <span className="text-white/50 text-sm">Distance</span>
+                      <DesktopMotion
+                        className="text-[#ff7e54] block"
+                      >
+                        6,530 mi
+                      </DesktopMotion>
+                      <DesktopMotion
+                        className="text-white/50 text-sm"
+                      >
+                        Distance
+                      </DesktopMotion>
                     </div>
                   </div>
                 </div>
@@ -762,10 +780,10 @@ export default function Home() {
                   <EarthGlobe size={100} />
                 </div>
               )}
-            </motion.div>
+            </DesktopMotion>
 
             {/* 3D Phone Display - only load when in viewport */}
-            <motion.div
+            <DesktopMotion
               ref={phoneSectionRef}
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -780,7 +798,7 @@ export default function Home() {
                   <div className="loading-spinner" />
                 </div>
               )}
-            </motion.div>
+            </DesktopMotion>
           </div>
         </div>
       </section>
@@ -797,7 +815,7 @@ export default function Home() {
           style={{ bottom: '10%', right: '5%' }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -810,45 +828,69 @@ export default function Home() {
             <p className="text-xl text-white/70">
               Start for free or unlock premium features for the ultimate experience
             </p>
-          </motion.div>
+          </DesktopMotion>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Free Tier */}
-            <motion.div
+            <DesktopMotion
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="glass rounded-2xl p-8 border border-white/10 hover:border-[#ff7e54]/30 transition-colors"
             >
-              <h3 className="text-2xl font-bold text-white mb-4">Free</h3>
-              <p className="text-4xl font-bold text-[#ff7e54] mb-8">$0<span className="text-lg text-white/50">/forever</span></p>
+              <DesktopMotion
+                className="text-2xl font-bold text-white mb-4"
+              >
+                Free
+              </DesktopMotion>
+              <DesktopMotion
+                className="text-4xl font-bold text-[#ff7e54] mb-8"
+              >
+                $0<DesktopMotion
+                  className="text-lg text-white/50"
+                >
+                  /forever
+                </DesktopMotion>
+              </DesktopMotion>
               <ul className="space-y-4 mb-8">
                 {freeTierFeatures.map((feature, index) => (
-                  <motion.li
+                  <DesktopMotion
                     key={feature}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className="flex items-center text-white/70"
                   >
-                    <span className="text-[#ff7e54] mr-3">✓</span>
-                    {feature}
-                  </motion.li>
+                    <DesktopMotion
+                      className="text-[#ff7e54] mr-3"
+                    >
+                      ✓
+                    </DesktopMotion>
+                    <DesktopMotion
+                      className="text-white/70"
+                    >
+                      {feature}
+                    </DesktopMotion>
+                  </DesktopMotion>
                 ))}
               </ul>
-              <motion.button
+              <DesktopMotion
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full px-8 py-4 border-2 border-[#ff7e54] text-[#ff7e54] rounded-full
                          font-semibold text-lg hover:bg-[#ff7e54]/10 transition-colors"
               >
-                <a href="/countdown">Get Started</a>
-              </motion.button>
-            </motion.div>
+                <DesktopMotion
+                  className="text-[#ff7e54]"
+                >
+                  <a href="/countdown">Get Started</a>
+                </DesktopMotion>
+              </DesktopMotion>
+            </DesktopMotion>
 
             {/* Premium Tier */}
-            <motion.div
+            <DesktopMotion
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -858,30 +900,54 @@ export default function Home() {
               <div className="absolute top-4 right-4 bg-[#ff7e54] text-black px-3 py-1 rounded-full text-sm font-medium">
                 Popular
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Premium</h3>
-              <p className="text-4xl font-bold text-[#ff7e54] mb-8">$30<span className="text-lg text-white/50">/year</span></p>
+              <DesktopMotion
+                className="text-2xl font-bold text-white mb-4"
+              >
+                Premium
+              </DesktopMotion>
+              <DesktopMotion
+                className="text-4xl font-bold text-[#ff7e54] mb-8"
+              >
+                $30<DesktopMotion
+                  className="text-lg text-white/50"
+                >
+                  /year
+                </DesktopMotion>
+              </DesktopMotion>
               <ul className="space-y-4 mb-8">
                 {premiumTierFeatures.map((feature, index) => (
-                  <motion.li
+                  <DesktopMotion
                     key={feature}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     className="flex items-center text-white/70"
                   >
-                    <span className="text-[#ff7e54] mr-3">✓</span>
-                    {feature}
-                  </motion.li>
+                    <DesktopMotion
+                      className="text-[#ff7e54] mr-3"
+                    >
+                      ✓
+                    </DesktopMotion>
+                    <DesktopMotion
+                      className="text-white/70"
+                    >
+                      {feature}
+                    </DesktopMotion>
+                  </DesktopMotion>
                 ))}
               </ul>
-              <motion.button
+              <DesktopMotion
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full px-8 py-4 bg-[#ff7e54] text-black rounded-full font-semibold text-lg"
               >
-                <a href="/countdown">Start Premium</a>
-              </motion.button>
-            </motion.div>
+                <DesktopMotion
+                  className="text-black"
+                >
+                  <a href="/countdown">Start Premium</a>
+                </DesktopMotion>
+              </DesktopMotion>
+            </DesktopMotion>
           </div>
         </div>
       </section>
@@ -919,25 +985,29 @@ export default function Home() {
           opacity={0.08}
           blur={12}
           speed="slow"
-          style={{ bottom: '20%', left: '10%' }}
+          style={{ bottom: '20%', left: '15%' }}
         />
         <div className="absolute inset-0 light-particles-sunset opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl font-bold bg-gradient-to-r from-[#ffb44d] via-[#ff7e54] to-[#cf4b6c] text-transparent bg-clip-text mb-6 text-shadow-sunset">
+            <DesktopMotion
+              className="text-5xl font-bold bg-gradient-to-r from-[#ffb44d] via-[#ff7e54] to-[#cf4b6c] text-transparent bg-clip-text mb-6 text-shadow-sunset"
+            >
               Stay Updated
-            </h2>
-            <p className="text-2xl bg-gradient-to-r from-[#ff7e54]/90 via-[#cf4b6c]/90 to-[#cf4b6c]/80 text-transparent bg-clip-text max-w-3xl mx-auto font-medium">
+            </DesktopMotion>
+            <DesktopMotion
+              className="text-2xl bg-gradient-to-r from-[#ff7e54]/90 via-[#cf4b6c]/90 to-[#cf4b6c]/80 text-transparent bg-clip-text max-w-3xl mx-auto font-medium"
+            >
               Join our AI travel community and be the first to experience new features.
-            </p>
-          </motion.div>
+            </DesktopMotion>
+          </DesktopMotion>
 
           <div className="flex justify-center">
             <SubscribeCard 
@@ -964,20 +1034,24 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-[#ff7e54]/10 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
+          <DesktopMotion
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-transparent bg-clip-text mb-4">
+            <DesktopMotion
+              className="text-4xl font-bold bg-gradient-to-r from-[#ff7e54] to-[#cf4b6c] text-transparent bg-clip-text mb-4"
+            >
               Meet the Team
-            </h2>
-            <p className="text-xl text-white/70">
+            </DesktopMotion>
+            <DesktopMotion
+              className="text-xl text-white/70"
+            >
               The minds behind your next adventure
-            </p>
-          </motion.div>
+            </DesktopMotion>
+          </DesktopMotion>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {teamMembers.map((member, index) => (
