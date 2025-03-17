@@ -30,26 +30,27 @@ function isAuthenticated(request: Request): boolean {
   return referer.includes('/admin');
 }
 
-// GET endpoint to retrieve all subscribed emails
-export async function GET(request: Request) {
+// Helper function to validate email
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// GET endpoint to fetch subscribers
+export async function GET() {
   try {
-    // Simple auth check for the admin endpoint
-    // This is NOT production-grade security
-    if (!isAuthenticated(request)) {
-      return NextResponse.json(
-        { error: 'Unauthorized access' },
-        { status: 401 }
-      );
-    }
-    
-    return NextResponse.json({
-      success: true,
-      count: subscribers.length,
-      emails: subscribers.map(sub => sub.email),
-      subscribers: subscribers
-    });
+    // Add CORS headers
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Cache-Control': 'no-store, must-revalidate',
+      'Content-Type': 'application/json',
+    };
+
+    return NextResponse.json({ subscribers, count: subscribers.length }, { headers });
   } catch (error) {
-    console.error('Error retrieving subscribers:', error);
+    console.error('Error in GET /api/subscribe:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -57,98 +58,104 @@ export async function GET(request: Request) {
   }
 }
 
+// POST endpoint to add new subscriber
 export async function POST(request: Request) {
   try {
-    // Add basic rate limiting in production
-    // You can use packages like 'express-rate-limit' with API routes
-    
-    const body = await request.json();
-    const { email, timestamp, source } = body;
+    const { email, source = 'website' } = await request.json();
 
     // Validate email
-    if (!email || typeof email !== 'string') {
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      );
-    }
-    
-    // More thorough email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: 'Invalid email address' },
         { status: 400 }
       );
     }
 
     // Check if email already exists
-    const existingIndex = subscribers.findIndex(sub => sub.email === email);
-    if (existingIndex >= 0) {
-      // Email exists but might be unsubscribed, update status to active
-      if (subscribers[existingIndex].status === 'unsubscribed') {
-        subscribers[existingIndex].status = 'active';
-        subscribers[existingIndex].timestamp = timestamp || new Date().toISOString();
-        
-        return NextResponse.json(
-          { success: true, message: 'Subscription reactivated!' },
-          { status: 200 }
-        );
+    const existingSubscriber = subscribers.find(sub => sub.email === email);
+    
+    if (existingSubscriber) {
+      if (existingSubscriber.status === 'unsubscribed') {
+        // Re-subscribe if previously unsubscribed
+        existingSubscriber.status = 'active';
+        existingSubscriber.timestamp = new Date().toISOString();
+        return NextResponse.json({ message: 'Re-subscribed successfully' });
       }
-      
       return NextResponse.json(
-        { message: 'Email already subscribed' },
-        { status: 200 }
+        { error: 'Email already subscribed' },
+        { status: 400 }
       );
     }
 
-    /**
-     * PRODUCTION DATABASE CODE:
-     * Replace the in-memory storage with your database of choice
-     * 
-     * Example MongoDB:
-     * await db.collection('subscribers').insertOne({ 
-     *   email, 
-     *   timestamp: timestamp || new Date().toISOString(),
-     *   source: source || 'website',
-     *   status: 'active'
-     * });
-     * 
-     * Example PostgreSQL with prisma:
-     * await prisma.subscriber.create({
-     *   data: {
-     *     email,
-     *     timestamp: timestamp || new Date().toISOString(),
-     *     source: source || 'website',
-     *     status: 'active',
-     *   }
-     * });
-     */
-    
-    // For development: use in-memory storage
+    // Add new subscriber
     const newSubscriber: Subscriber = {
       email,
-      timestamp: timestamp || new Date().toISOString(),
-      source: source || 'website',
+      timestamp: new Date().toISOString(),
+      source,
       status: 'active'
     };
-    
+
     subscribers.push(newSubscriber);
-    
-    console.log('Subscriber added:', newSubscriber);
+    console.log(`New subscriber added: ${email}`);
+    console.log(`Total subscribers: ${subscribers.length}`);
+
+    // Add CORS headers
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
 
     return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Successfully subscribed!'
-      },
-      { status: 201 }
+      { message: 'Subscribed successfully' },
+      { headers }
     );
   } catch (error) {
-    console.error('Subscription error:', error);
+    console.error('Error in POST /api/subscribe:', error);
     return NextResponse.json(
-      { error: 'Server error processing your request' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
-} 
+}
+
+// OPTIONS endpoint for CORS preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
+// Note: For production, replace in-memory storage with a database
+// Example with MongoDB:
+/*
+import { MongoClient } from 'mongodb';
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+
+async function connectDB() {
+  try {
+    await client.connect();
+    return client.db('sojourn').collection('subscribers');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    throw error;
+  }
+}
+
+export async function GET() {
+  try {
+    const collection = await connectDB();
+    const subscribers = await collection.find({}).toArray();
+    return NextResponse.json({ subscribers, count: subscribers.length });
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+*/ 

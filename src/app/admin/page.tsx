@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Login handling
   const handleLogin = (e: React.FormEvent) => {
@@ -29,7 +30,13 @@ export default function AdminPage() {
     if (username === 'AdminHCV' && password === 'Harshishell') {
       setIsLoggedIn(true);
       // Store login state in session storage to persist across page refreshes
-      sessionStorage.setItem('adminLoggedIn', 'true');
+      try {
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        fetchSubscribers(); // Fetch subscribers after successful login
+      } catch (err) {
+        console.error('Error storing session:', err);
+        setLoginError('Failed to store session. Please try again.');
+      }
     } else {
       setLoginError('Invalid username or password');
     }
@@ -37,12 +44,20 @@ export default function AdminPage() {
 
   useEffect(() => {
     // Check if user is already logged in
-    const loggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
+    try {
+      const loggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+      setIsLoggedIn(loggedIn);
+      setIsInitialized(true);
 
-    if (loggedIn) {
-      fetchSubscribers();
-    } else {
+      if (loggedIn) {
+        fetchSubscribers();
+      } else {
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Error checking session:', err);
+      setIsLoggedIn(false);
+      setIsInitialized(true);
       setIsLoading(false);
     }
   }, []);
@@ -50,10 +65,18 @@ export default function AdminPage() {
   async function fetchSubscribers() {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/subscribe');
+      setError('');
+      
+      const response = await fetch('/api/subscribe', {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch subscriber data');
+        throw new Error(`Failed to fetch subscriber data: ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -74,15 +97,24 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Error fetching subscribers:', err);
-      setError('Failed to load subscriber data. Please try again later.');
+      setError('Failed to load subscriber data. Please try refreshing the page.');
+      // If we get an unauthorized error, log the user out
+      if (err.message.includes('401') || err.message.includes('403')) {
+        handleLogout();
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
   const handleLogout = () => {
+    try {
+      sessionStorage.removeItem('adminLoggedIn');
+    } catch (err) {
+      console.error('Error clearing session:', err);
+    }
     setIsLoggedIn(false);
-    sessionStorage.removeItem('adminLoggedIn');
+    setSubscribers([]);
   };
 
   // Format date for display
@@ -99,6 +131,16 @@ export default function AdminPage() {
     }
   };
 
+  // Show loading state while checking session
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#ff7e54]"></div>
+      </div>
+    );
+  }
+
+  // Show login page if not logged in
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 pt-32">
