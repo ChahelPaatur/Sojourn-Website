@@ -99,7 +99,8 @@ export default function AdminPage() {
       console.error('Error fetching subscribers:', err);
       setError('Failed to load subscriber data. Please try refreshing the page.');
       // If we get an unauthorized error, log the user out
-      if (err.message.includes('401') || err.message.includes('403')) {
+      if (err instanceof Error && 
+         (err.message.includes('401') || err.message.includes('403'))) {
         handleLogout();
       }
     } finally {
